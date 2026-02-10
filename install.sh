@@ -75,82 +75,18 @@ set_zsh_default() {
     fi
 }
 
-deploy_dotfiles() {
-    if [ ! -d "$dotfiles_dir" ]; then
-        echo "Dotfiles directory '$dotfiles_dir' does not exist. Clone your repo first!"
-        exit 1
-    fi
+install_dotfiles() {
+    echo "Stowing dotfiles..."
 
-    # Allow overriding the target (useful for testing) and a dry-run mode
-    target="${STOW_TARGET:-$config_target}"
-    dry_run="${STOW_DRY_RUN:-0}"
+    cd "$dotfiles_dir"
 
-    # Ensure stow is available
-    if ! command -v stow >/dev/null 2>&1; then
-        echo "Error: 'stow' is not installed. Install it (e.g., pacman -S stow or yay -S stow) and retry."
-        exit 1
-    fi
+    # Ensure ~/.config exists
+    mkdir -p "$HOME/.config"
 
-    # Make sure the target exists
-    mkdir -p "$target"
+    # Stow the .config package into $HOME
+    stow --adopt -t "$HOME/.config" -v .config
 
-    # Exclude obvious non-config top-level folders/files
-    EXCLUDES=(".git" ".idea" "install.sh")
-
-    echo "Deploying configs from $dotfiles_dir to $target using stow..."
-    echo "Excluding: ${EXCLUDES[*]}"
-    if [ "$dry_run" -ne 0 ]; then
-        echo "Running in dry-run mode (no changes will be made). Set STOW_DRY_RUN=0 to apply changes."
-    fi
-
-    cd "$dotfiles_dir" || { echo "Failed to cd to $dotfiles_dir"; exit 1; }
-
-    # Discover stow packages (top-level directories) but skip exclusions
-    stow_pkgs=()
-    for d in .*/ */ ; do
-        # skip if the glob didn't match anything
-        [ -e "$d" ] || continue
-        name="${d%/}"
-        
-        # skip '.' and '..'
-        if [ "$name" = "." ] || [ "$name" = ".." ]; then
-            continue
-        fi
-        
-        # skip if in EXCLUDES
-        skip=0
-        for ex in "${EXCLUDES[@]}"; do
-            if [ "$name" = "$ex" ]; then
-                skip=1
-                break
-            fi
-        done
-        if [ "$skip" -eq 1 ]; then
-            echo "Skipping '$name'"
-            continue
-        fi
-        # Only consider directories
-        if [ -d "$name" ]; then
-            stow_pkgs+=("$name")
-        fi
-    done
-
-    if [ ${#stow_pkgs[@]} -eq 0 ]; then
-        echo "No packages to stow. Nothing to do."
-        return 0
-    fi
-
-    # Run stow for each package (dry-run if requested)
-    for pkg in "${stow_pkgs[@]}"; do
-        echo "Processing stow package: $pkg"
-        if [ "$dry_run" -ne 0 ]; then
-            stow -n -v -t "$target" "$pkg" || { echo "Dry-run stow failed for $pkg"; continue; }
-        else
-            stow -v -t "$target" "$pkg" || { echo "Stow failed for $pkg"; exit 1; }
-        fi
-    done
-
-    echo "Dotfiles deployed successfully!"
+    echo "Dotfiles stowed successfully!"
 }
 
 case "$1" in
@@ -160,7 +96,7 @@ case "$1" in
 	sudo pacman -S --noconfirm "${pacman_packages[@]}"
 	yay -S --noconfirm "${aur_packages[@]}"
 	set_zsh_default
-	deploy_dotfiles
+	install_dotfiles
         echo "=== Essential packages installed successfully! ==="
         echo "NOTE: The installer sets zsh as your default shell. You must log out and log back in (re-login) for this to take effect in new sessions."
         ;;
