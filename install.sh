@@ -8,7 +8,7 @@ pacman_packages=(
   brightnessctl network-manager-applet bluez bluez-utils blueman pipewire wireplumber pavucontrol
 )
 
-yay_packages=(
+aur_packages=(
     # Environment
     wlogout
             
