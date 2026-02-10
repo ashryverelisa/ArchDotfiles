@@ -2,10 +2,19 @@
 
 pacman_packages=(
 	# Enviroment
-	waybar rofi rofi-emoji zsh	
+	hyprlock waybar rofi rofi-emoji zsh	
+	
+	# System
+  brightnessctl network-manager-applet bluez bluez-utils blueman pipewire wireplumber pavucontrol
 )
 
-yay_packages=()
+yay_packages=(
+    # Environment
+    wlogout
+            
+    # Communication
+    vesktop
+)
 
 set -e
 
