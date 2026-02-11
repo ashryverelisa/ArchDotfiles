@@ -33,6 +33,7 @@ pacman_packages=(
     cava
     eza
     neovim
+    rsync
 
     # System tools for rice
     brightnessctl
