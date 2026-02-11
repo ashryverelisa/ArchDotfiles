@@ -1,0 +1,22 @@
+* {
+    background: #1f1d2e;
+    foreground: #e6e1ff;
+    select: #2a2738;
+
+    pink: #f5bde6;
+    purple: #b7a6ff;
+    red: #f28fad;
+    orange: #f5c37b;
+    yellow: #f7e3a6;
+    green: #b7f5c4;
+    blue: #9ad1ff;
+    gray: #34354a;
+
+    active-background: @select;
+    urgent-background: @red;
+    urgent-foreground: @background;
+    selected-background: @active-background;
+    selected-urgent-background: @urgent-background;
+    selected-active-background: @active-background;
+    bordercolor: @select;
+}
