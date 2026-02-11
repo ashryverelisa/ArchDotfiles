@@ -25,6 +25,12 @@ pacman_packages=(
     pipewire
     wireplumber
     pavucontrol
+    
+    # Tools
+    neovim
+    
+    # Misc
+    kvantum-qt5
 )
 
 aur_packages=(
