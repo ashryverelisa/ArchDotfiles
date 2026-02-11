@@ -32,6 +32,7 @@ pacman_packages=(
     neovim
     
     # Misc
+    eza
     kvantum-qt5
 )
 
