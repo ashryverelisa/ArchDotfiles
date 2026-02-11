@@ -1,17 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "$(date) - pip-toggle wurde gestartet" >> /tmp/pip-toggle.log
-
 MODE=$(hyprctl monitors | grep -A1 "Monitor DP-1" | tail -n1 | awk '{print $1}' | cut -d'@' -f1)
-echo "$(date) - aktueller Mode: $MODE" >> /tmp/pip-toggle.log
 
 if [[ "$MODE" == "5120x1440" ]]; then
   hyprctl keyword monitor DP-1,2560x1440@240.00,0x0,1
   hyprctl keyword monitor HDMI-A-1,2560x1440@240.00,2560x0,1
-  echo "$(date) - gewechselt zu PiP" >> /tmp/pip-toggle.log
 else
   hyprctl keyword monitor DP-1,5120x1440@239.76,0x0,1
   hyprctl keyword monitor HDMI-A-1,5120x1440@239.76,5120x0,1
-  echo "$(date) - gewechselt zu Normal" >> /tmp/pip-toggle.log
 fi
