@@ -10,6 +10,8 @@ readonly DOTFILES_DIR="$HOME/ArchDotfiles"
 pacman_packages=(
     # Environment
     hyprlock
+    hyprpicker
+    hyprsunset
     waybar
     rofi
     rofi-emoji
@@ -17,6 +19,8 @@ pacman_packages=(
     stow
     kitty
     fastfetch
+    btop
+    cava
 
     # System
     brightnessctl
@@ -27,6 +31,7 @@ pacman_packages=(
     pipewire
     wireplumber
     pavucontrol
+    polkit-gnome
     
     # Tools
     neovim
