@@ -15,6 +15,8 @@ pacman_packages=(
     rofi-emoji
     zsh
     stow
+    kitty
+    fastfetch
 
     # System
     brightnessctl
