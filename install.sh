@@ -64,6 +64,7 @@ aur_packages=(
     # Rice-related packages
     wlogout
     awww-bin
+    gslapper
     
     # Audio tools
     pwvucontrol
