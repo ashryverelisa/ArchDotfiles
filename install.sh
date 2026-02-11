@@ -8,44 +8,63 @@ set -Eeuo pipefail
 readonly DOTFILES_DIR="$HOME/ArchDotfiles"
 
 pacman_packages=(
-    # Environment
+    # Hyprland ecosystem
     hyprlock
     hyprpicker
     hyprsunset
+
+    # Notification and system bars
+    swaync
     waybar
+    
+    # Application launchers and menus
     rofi
+    rofi-calc
     rofi-emoji
+
+    # Terminal emulator
+    kitty
+
+    # Shell and terminal utilities
     zsh
     stow
-    kitty
     fastfetch
     btop
     cava
+    eza
+    neovim
 
-    # System
+    # System tools for rice
     brightnessctl
-    network-manager-applet
-    bluez
-    bluez-utils
-    blueman
-    pipewire
-    wireplumber
-    pavucontrol
-    polkit-gnome
     unrar
     unzip
     
-    # Tools
-    neovim
-    
-    # Misc
-    eza
+    # Audio system
+    jack2
+    pipewire
+    pipewire-alsa
+    pipewire-pulse
+    gst-plugin-pipewire
+    libpulse
+    wireplumber
+        
+    # Network essentials
+    bluez
+    bluez-utils
+    network-manager-applet 
+
+    # System utilities
+    polkit-gnome
+    blueman
     kvantum-qt5
 )
 
 aur_packages=(
-    # Environment
+    # Rice-related packages
     wlogout
+    
+    # Audio tools
+    pwvucontrol
 
     # Communication
     vesktop
