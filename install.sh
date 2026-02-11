@@ -146,6 +146,15 @@ install_dotfiles() {
     echo "Dotfiles stowed successfully!"
 }
 
+make_scripts_executable() {
+    echo "Setting executable permissions for .sh scripts in ~/.config/waybar and ~/.config/hypr..."
+
+    find "$HOME/.config/waybar" -type f -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+    find "$HOME/.config/hypr"   -type f -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+
+    echo "Done."
+}
+
 ### ======================
 ### Main
 ### ======================
@@ -164,6 +173,8 @@ case "$1" in
 
         set_zsh_default
         install_dotfiles
+        
+        make_scripts_executable
 
         echo "=== Setup complete ==="
         echo "Note: Re-login required if your shell was changed."
