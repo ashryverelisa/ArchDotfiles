@@ -63,6 +63,7 @@ pacman_packages=(
 aur_packages=(
     # Rice-related packages
     wlogout
+    awww-bin
     
     # Audio tools
     pwvucontrol
