@@ -32,6 +32,8 @@ pacman_packages=(
     wireplumber
     pavucontrol
     polkit-gnome
+    unrar
+    unzip
     
     # Tools
     neovim
