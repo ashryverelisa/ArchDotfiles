@@ -159,6 +159,16 @@ make_scripts_executable() {
     echo "Done."
 }
 
+create_picture_folders() {
+    echo "Creating Pictures folders..."
+
+    mkdir -p "$HOME/Pictures/Screenshots"
+    mkdir -p "$HOME/Pictures/Thumbnails"
+    mkdir -p "$HOME/Pictures/Wallpapers"
+
+    echo "Pictures folders created."
+}
+
 ### ======================
 ### Main
 ### ======================
@@ -179,7 +189,8 @@ case "$1" in
         install_dotfiles
         
         make_scripts_executable
-
+        create_picture_folders
+        
         echo "=== Setup complete ==="
         echo "Note: Re-login required if your shell was changed."
         ;;
