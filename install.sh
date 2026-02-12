@@ -59,6 +59,8 @@ pacman_packages=(
     polkit-gnome
     blueman
     kvantum-qt5
+    grim
+    slurp
 )
 
 aur_packages=(
