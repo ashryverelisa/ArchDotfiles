@@ -12,6 +12,7 @@
             "network",
             "custom/wallpaper"
     ],
+    "modules-right": ["clock","custom/power"],
     
     "custom/launcher": {
         "format": "",
@@ -43,4 +44,30 @@
         "tooltip-format": "Pick from {} wallpapers!",
         "on-click": "~/.config/waybar/scripts/wallpaper-selector.sh"
     },
+    "clock": {
+        "format": "{:%Y/%m/%d %H:%M:%S}",
+        "on-click": "kitty --class floating --title 'Calendar' -e calcurse",
+        "tooltip-format": "<b><span color='#ffae12'><big>Click to launch </big></span></b>\n\n<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "year",
+            "mode-mon-col": 3,
+            "weeks-pos": "right",
+            "on-scroll": 1,
+            "on-click-right": "mode",
+            "format": {
+                "months":     "<span color='#ffead3'><b>{}</b></span>",
+                "days":       "<span color='#ecc6d9'><b>{}</b></span>",
+                "weeks":      "<span color='#99ffdd'><b>W{}</b></span>",
+                "weekdays":   "<span color='#ffcc66'><b>{}</b></span>",
+                "today":      "<span color='#ff6699'><b><u>{}</u></b></span>"
+            }
+        },
+        "interval": 1
+    },
+    "custom/power": {
+        "exec": "~/.config/waybar/scripts/battery-status.sh",
+        "return-type": "json",
+        "interval": 10,
+        "on-click": "wlogout --buttons-per-row 3"
+    }    
 }
