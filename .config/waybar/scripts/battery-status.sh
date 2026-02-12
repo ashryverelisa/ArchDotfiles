@@ -1,103 +1,93 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# Check if battery exists
-BATTERY_PATH="/sys/class/power_supply/BAT0"
-if [ ! -d "$BATTERY_PATH" ] && [ ! -d "/sys/class/power_supply/BAT1" ]; then
-    # No battery found - desktop PC
-    echo '{"text":"󰐥","tooltip":"Power Menu","class":"no-battery"}'
-    exit 0
+# ---------------------------
+# Find battery path (BAT0 or BAT1)
+# ---------------------------
+BAT_PATH=""
+for b in /sys/class/power_supply/BAT{0,1}; do
+  [[ -d "$b" ]] && { BAT_PATH="$b"; break; }
+done
+
+if [[ -z "$BAT_PATH" ]]; then
+  echo '{"text":"󰐥","tooltip":"Power Menu","class":"no-battery"}'
+  exit 0
 fi
 
-# Find battery (could be BAT0 or BAT1)
-if [ -d "$BATTERY_PATH" ]; then
-    BATTERY="BAT0"
-elif [ -d "/sys/class/power_supply/BAT1" ]; then
-    BATTERY="BAT1"
-    BATTERY_PATH="/sys/class/power_supply/BAT1"
-fi
+# ---------------------------
+# Helpers
+# ---------------------------
+read_val() {
+  local file="$1"
+  [[ -f "$file" ]] && cat "$file" || echo ""
+}
 
-# Get battery info
-capacity=$(cat "$BATTERY_PATH/capacity")
-status=$(cat "$BATTERY_PATH/status")
+safe_div() {
+  local num=$1 den=$2
+  (( den == 0 )) && echo 0 || echo $(( num / den ))
+}
 
-# Determine icon based on capacity and status
-if [ "$status" = "Charging" ]; then
-    icon="󰂄"  # Charging icon
-    class="charging"
-elif [ "$status" = "Full" ]; then
-    icon="󰁹"  # Full battery
-    class="full"
+# ---------------------------
+# Read values
+# ---------------------------
+capacity=$(read_val "$BAT_PATH/capacity")
+status=$(read_val "$BAT_PATH/status")
+
+# Determine icon/class
+icon="󰁹"
+class="full"
+
+if [[ "$status" == "Charging" ]]; then
+  icon="󰂄"
+  class="charging"
+elif [[ "$status" == "Full" ]]; then
+  icon="󰁹"
+  class="full"
 else
-    # Discharging - show appropriate battery level icon
-    if [ "$capacity" -ge 90 ]; then
-        icon="󰁹"
-        class="full"
-    elif [ "$capacity" -ge 70 ]; then
-        icon="󰂀"
-        class="good"
-    elif [ "$capacity" -ge 50 ]; then
-        icon="󰁾"
-        class="medium"
-    elif [ "$capacity" -ge 30 ]; then
-        icon="󰁼"
-        class="low"
-    elif [ "$capacity" -ge 10 ]; then
-        icon="󰁺"
-        class="critical"
-    else
-        icon="󰂃"
-        class="critical"
-    fi
+  case $capacity in
+    ''|*[!0-9]*) icon="󰂃"; class="unknown" ;;
+    [9][0-9]|100) icon="󰁹"; class="full" ;;
+    [7-8][0-9]) icon="󰂀"; class="good" ;;
+    [5-6][0-9]) icon="󰁾"; class="medium" ;;
+    [3-4][0-9]) icon="󰁼"; class="low" ;;
+    [1-2][0-9]) icon="󰁺"; class="critical" ;;
+    0) icon="󰂃"; class="critical" ;;
+  esac
 fi
 
-if [ -f "$BATTERY_PATH/power_now" ] && [ -f "$BATTERY_PATH/energy_now" ]; then
-    power_now=$(cat "$BATTERY_PATH/power_now")
-    energy_now=$(cat "$BATTERY_PATH/energy_now")
+# ---------------------------
+# Calculate time remaining / until full
+# ---------------------------
+tooltip="$icon ${capacity:-?}% - ${status:-Unknown}"
 
-    if [ "$power_now" -gt 0 ]; then
-        if [ "$status" = "Charging" ]; then
-            energy_full=$(cat "$BATTERY_PATH/energy_full")
-            time_seconds=$(( (energy_full - energy_now) * 3600 / power_now ))
-            hours=$((time_seconds / 3600))
-            minutes=$(( (time_seconds % 3600) / 60 ))
-            tooltip="$icon $capacity% - ${hours}h ${minutes}m until full"
-        else
-            time_seconds=$(( energy_now * 3600 / power_now ))
-            hours=$((time_seconds / 3600))
-            minutes=$(( (time_seconds % 3600) / 60 ))
-            tooltip="$icon $capacity% - ${hours}h ${minutes}m remaining"
-        fi
-    else
-        tooltip="$icon $capacity% - $status"
-    fi
-elif [ -f "$BATTERY_PATH/current_now" ] && [ -f "$BATTERY_PATH/charge_now" ]; then
-    current_now=$(cat "$BATTERY_PATH/current_now")
-    charge_now=$(cat "$BATTERY_PATH/charge_now")
-    
-    absolute_current_now=${current_now#-}
+# energy_* (preferred)
+energy_now=$(read_val "$BAT_PATH/energy_now")
+power_now=$(read_val "$BAT_PATH/power_now")
+energy_full=$(read_val "$BAT_PATH/energy_full")
 
-    if [ "$absolute_current_now" -gt 0 ]; then
-        if [ "$status" = "Charging" ]; then
-            charge_full=$(cat "$BATTERY_PATH/charge_full")
-            
-            time_seconds=$(( (charge_full - charge_now) * 3600 / absolute_current_now ))
-            
-            hours=$((time_seconds / 3600))
-            minutes=$(( (time_seconds % 3600) / 60 ))
-            tooltip="$icon $capacity% - ${hours}h ${minutes}m until full"
-        else
-            time_seconds=$(( charge_now * 3600 / absolute_current_now ))
-            
-            hours=$((time_seconds / 3600))
-            minutes=$(( (time_seconds % 3600) / 60 ))
-            tooltip="$icon $capacity% - ${hours}h ${minutes}m remaining"
-        fi
-    else
-        tooltip="$icon $capacity% - $status"
-    fi
-else
-    tooltip="$icon $capacity% - $status"
+# fallback charge_* if energy_* not available
+if [[ -z "$energy_now" || -z "$power_now" ]]; then
+  energy_now=$(read_val "$BAT_PATH/charge_now")
+  power_now=$(read_val "$BAT_PATH/current_now")
+  energy_full=$(read_val "$BAT_PATH/charge_full")
 fi
 
-# Output JSON for waybar
-echo "{\"text\":\"$icon $capacity%\",\"tooltip\":\"$tooltip\",\"class\":\"$class\"}"
+if [[ -n "$energy_now" && -n "$power_now" && "$power_now" -gt 0 ]]; then
+  if [[ "$status" == "Charging" ]]; then
+    remaining=$(( (energy_full - energy_now) * 3600 / power_now ))
+    label="until full"
+  else
+    remaining=$(( energy_now * 3600 / power_now ))
+    label="remaining"
+  fi
+
+  hours=$(( remaining / 3600 ))
+  mins=$(( (remaining % 3600) / 60 ))
+  tooltip="$icon ${capacity:-?}% - ${hours}h ${mins}m ${label}"
+fi
+
+# ---------------------------
+# Output JSON
+# ---------------------------
+printf '{"text":"%s %s%%","tooltip":"%s","class":"%s"}\n' \
+  "$icon" "$capacity" "$tooltip" "$class"
