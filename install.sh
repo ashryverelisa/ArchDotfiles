@@ -37,6 +37,7 @@ pacman_packages=(
 
     # System tools for rice
     brightnessctl
+    imagemagick
     unrar
     unzip
     

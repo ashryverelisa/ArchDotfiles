@@ -1,89 +1,46 @@
 {
-    "modules-left": ["custom/power"],
-    "modules-center": ["hyprland/workspaces"],
-    "modules-right": ["tray", "bluetooth", "network", "battery", "pulseaudio", "clock"],
-
-    "custom/power": {
-        "format": "⏻",
-        "tooltip": false,
-        "on-click": "wlogout -b 5"
+    "layer": "top",
+    "position": "top",
+    "height": 20,
+    "spacing": 4,
+    "reload_style_on_change": true,
+        
+    "modules-left": [
+            "custom/launcher",
+            "cpu",
+            "custom/memory-gpu",
+            "network",
+            "custom/wallpaper"
+    ],
+    
+    "custom/launcher": {
+        "format": "",
+        "tooltip-format": "Application launcher",
+        "on-click": "rofi -show drun -modi drun -theme ~/.config/rofi/grid.rasi"
+    },       
+    "cpu": {
+        "format": "󰻠 {usage}%",
+        "interval": 2,
+        "on-click": "kitty --class floating --title floating -e sh -c 'while true; do btop; sleep 0.1; done' &"
     },
-
-    "hyprland/workspaces": {
-        "disable-scroll": true,
-        "all-outputs": true,
-        "warp-on-scroll": false,
-        "format": "{name}",
-        "cursor": true
+    "custom/memory-gpu": {
+        "exec": "~/.config/waybar/scripts/gpu.sh",
+        "format": "{}",
+        "return-type": "json",
+        "interval": 2,
+        "on-click": "kitty --class floating --title floating -e sh -c 'while true; do btop; sleep 0.1; done' &"
     },
-
-    "tray": {
-        "icon-size": 20,
-        "spacing": 10,
-        "cursor": true
-    },
-
-    "bluetooth": {
-        "format": "",
-        "format-disabled": "󰂲",
-        "format-connected": "󰂱",
-        "on-click": "blueman-manager",
-        "tooltip": true
-    },
-
     "network": {
-        "format-wifi": "  {essid}",
-        "format-ethernet": "  Ethernet",
-        "format-linked": "  Linked (No IP)",
-        "format-disconnected": "  Disconnected",
-        "tooltip": true,
-        "cursor": true
+        "format": "󰇚 {bandwidthDownBits} 󰕒 {bandwidthUpBits}",
+        "format-disconnected": "󰛳 Disconnected",
+        "tooltip-format": "Down: {bandwidthDownBits} Up: {bandwidthUpBits}",
+        "interval": 2,
+        "on-click": "kitty --class floating --title floating -e sh -c 'while true; do btop; sleep 0.1; done' &"
     },
-
-    "battery": {
-        "states": {
-            "good": 85,
-            "warning": 30,
-            "critical": 15
-        },
-        "format": "{icon} {capacity}%",
-        "format-full": "{icon} {capacity}%",
-        "format-plugged": " {capacity}%",
-        "format-charging": " {capacity}%",
-        "format-alt": "{icon} {capacity}%",
-        "format-icons": [" ", " ", " ", " ", " "],
-        "tooltip-format": "{time}",
-        "cursor": true
+    "custom/wallpaper": {
+        "exec": "ls ~/Pictures/Wallpapers | wc -l",
+        "format": "",
+        "tooltip-format": "Pick from {} wallpapers!",
+        "on-click": "~/.config/waybar/scripts/wallpaper-selector.sh"
     },
-
-    "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-muted": "  {volume}%",
-        "format-bluetooth": " {volume}%",
-        "format-bluetooth-muted": "  {volume}%",
-        "format-icons": {
-            "headphone": " ",
-            "headset": " ",
-            "default": [" "]
-        },
-        "on-click": "pavucontrol",
-        "tooltip": true,
-        "cursor": true
-    },
-
-    "clock": {
-        "format": "{:%d/%m/%Y - %H:%M}",
-        "tooltip-format": "<span size='15000'><tt>{calendar}</tt></span>",
-        "calendar": {
-            "mode": "month",
-            "format": {
-                "months": "<span color='#F5C2E7'><b>{}</b></span>",
-                "weekdays": "<span color='#89B4FA'><b>{}</b></span>",
-                "days": "<span color='#CDD6F4'><b>{}</b></span>",
-                "today": "<span color='#F9E2AF'><b>{}</b></span>"
-            }
-        },
-        "on-click": "swaync-client -t -sw",
-        "cursor": true
-    }
 }
