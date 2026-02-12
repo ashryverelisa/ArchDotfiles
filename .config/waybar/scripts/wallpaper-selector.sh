@@ -90,7 +90,7 @@ if [ -n "$selected" ]; then
             magick "$wallpaper_path[0]" +adjoin "$HOME/.cache/last_wallpaper_static.jpg"
             sleep 0.5
             notify-send -a "Wallpaper" "Applying Wallpaper & Theme" "$selected" -i "$wallpaper_path"
-            awww img "$wallpaper_path"
+            awww img --transition-type wipe --transition-angle 30 --transition-step 90 --resize crop "$wallpaper_path"
         fi
     else
         notify-send -a "Wallpaper" "Error" "Wallpaper file not found: $wallpaper_path"
